@@ -5,7 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import patches
 import os
-from gcg_template import gcg_graph
+from excel_interface.gcg_template import gcg_graph
 
 ###----- use custom mplstyle file to define a template -----###
 mpl.style.use('CPT.mplstyle')

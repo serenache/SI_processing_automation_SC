@@ -94,7 +94,7 @@ SCPT_Location = extract_list_from_input_df(global_variable_df,'SCPT location')  
 
 ###-----main function to return the dataframe dictionary as excel for checking purposes-----  ###
 def pd_to_excel(df, output_folder_path):
-    excel_path = os.path.join(output_folder_path, "CPT_data-v2.xlsx")
+    excel_path = os.path.join(output_folder_path, "CPT_processed_data-v2.xlsx")
     df.to_excel(excel_path)
     return
 

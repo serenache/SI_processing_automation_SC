@@ -1,4 +1,5 @@
 import csv
+import os.path
 
 #This file will contain functions that will be used for specific data processing needs
 
@@ -10,7 +11,7 @@ import csv
 #We should look for a balance between 20 inputs (frequency, tolerance, units, etc) that will have to be in the excel file
 #and the user experience in the excel interface
 
-def fun1_M(file, var1, var2, label, M, lin_start, style):
+def fun1_M(file, var1, var2, label, M, lin_start, style,input_data_files_path):
     print('    Plotting function for M')
 
     var1_col = int(var1.split("-")[0])
@@ -20,7 +21,7 @@ def fun1_M(file, var1, var2, label, M, lin_start, style):
     Y_data = []
     X_data2 = []
     Y_data2 = []
-    f = open('.\data_files\\'+file)
+    f = open(os.path.join(input_data_files_path,file))
     wbData = csv.reader(f)
     i = 1
     for line in wbData:
@@ -47,7 +48,7 @@ def fun1_M(file, var1, var2, label, M, lin_start, style):
     Style_data.append(0)
     return X_data, Y_data, Label_data, Style_data
 
-def fun1_dp0T(file, var1, var2, label, lin_start, style):
+def fun1_dp0T(file, var1, var2, label, lin_start, style,input_data_files_path):
     print('    Plotting function for dp/po x Number of Cycles')
     var1_col = int(var1.split("-")[0])
     var2_col = int(var2.split("-")[0])
@@ -55,7 +56,7 @@ def fun1_dp0T(file, var1, var2, label, lin_start, style):
     X_data = []
     Y_data = []
 
-    f = open('.\data_files\\'+file)
+    f = open(os.path.join(input_data_files_path,file))
     wbData = csv.reader(f)
     i = 1
     for line in wbData:
