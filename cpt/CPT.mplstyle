@@ -1,0 +1,47 @@
+# Figure properties
+figure.figsize: 8.27,11.69
+figure.dpi: 72
+savefig.dpi: 300
+
+
+# Font Properties
+font.family: Arial
+font.style: normal
+font.variant: normal
+font.weight: normal
+font.stretch: normal
+font.size: 20.0
+
+mathtext.fontset: stix
+text.usetex: False
+
+# Axes properties
+axes.prop_cycle: cycler('color',['ff1f5b','009ADe','af58ba','ffc61e','f28522','a0b1ba','a6761d','e377c2','2ca02c','17becf','7f7f7f','9467bd','ff7f0e','1f77b4','d62728','bcdb22'])
+axes.linewidth: 1
+axes.labelpad: 5
+axes.grid: False
+axes.labelsize: 20  # fontsize of the x any y labels
+
+# Legend
+legend.fontsize: 15
+legend.loc: upper center
+
+
+
+# Grid properties
+grid.alpha: 0.5
+grid.linewidth: 0.5
+grid.linestyle: -
+
+# Tick properties
+# x-axis
+xtick.top: True
+xtick.direction: in
+xtick.major.size: 4
+xtick.minor.size: 2
+
+# y-axis
+ytick.right: True
+ytick.direction: in
+ytick.major.size: 4
+ytick.minor.size: 2
