@@ -118,7 +118,6 @@ class CPT_figure():
                 figsize=(11.69, 8.27)
             )
             axs[0].invert_yaxis()  # set that the y axis (depth) is inverted (only need to set here as we share y axis)
-
         self.f=f
         self.axs=axs
 
@@ -197,6 +196,7 @@ class CPT_figure():
             ax.xaxis.set_label_position('top')
             ax.tick_params(axis='both', which='major', labelsize=15)
         f.tight_layout()  # remove blank space
+        plt.subplots_adjust(wspace=0.15)
         self.axs=axs
         self.f=f
 
@@ -263,6 +263,7 @@ class CPT_figure():
         ax2 = axs.flatten()[1]
         plot_stratigraphy_column(ax2, SOIL_UNIT_TABLE, stratigraphy_color_dict)
         f.tight_layout()  # remove blank space
+        plt.subplots_adjust(wspace=0.15)
         self.axs = axs
         self.f = f
 
@@ -319,6 +320,7 @@ class CPT_figure():
         ax2 = axs.flatten()[len(plot_list)]
         plot_stratigraphy_column(ax2, SOIL_UNIT_TABLE, stratigraphy_color_dict)
         f.tight_layout()  # remove blank space
+        plt.subplots_adjust(wspace=0.15)
         self.axs = axs
         self.f = f
 

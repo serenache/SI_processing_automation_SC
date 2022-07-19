@@ -33,6 +33,7 @@ input_excel_path=os.path.join(programme_folder_path, '../Input_files/Python_CPT_
 global_variable_df = pd.read_excel(input_excel_path, sheet_name='Global_variable', index_col=0)
 single_plot_input_df = pd.read_excel(input_excel_path, sheet_name='Single_plot_input')
 side_by_side_plot_input_df = pd.read_excel(input_excel_path, sheet_name='Side_by_side_plot_input')
+stratigraphy_color_input_df = pd.read_excel(input_excel_path,sheet_name='stratigraphy_color_dict')
 
 # figure extension: e.g. '.svg', '.png'
 ext_fig = extract_values_from_input_df(global_variable_df,'Figure_extension')
@@ -42,7 +43,6 @@ proj_folder_path = extract_values_from_input_df(global_variable_df,'Project fold
 
 # Input folder path for excels or database file
 input_folder_path=extract_values_from_input_df(global_variable_df,'Input folder path')
-
 
 # folder path for saving figures
 folder_fig = extract_values_from_input_df(global_variable_df,'Figure folder path')
@@ -86,6 +86,7 @@ Dr_limits = {'Limit': [0, 15, 35, 65, 85],
              'Description': ['Very \nloose', 'Loose', 'Medium \ndense', 'Dense', 'Very \ndense']}
 # SCPT location that we want to plot --> specified by user
 SCPT_Location = extract_list_from_input_df(global_variable_df,'SCPT location')  # ['BH06-TAICHUNG'] for RWE Taiwan project and for ['WTG_L097_028'] Hornsea Two Project
+
 ###----------------------------------------------------------------------------------  ###
 
 
@@ -140,7 +141,8 @@ if load_gINT_database_as_dataframe_and_merge:
     merged_SCPT = calc.merge_tables(SCPT, SCPG, SCPT_Location, SOIL_UNIT, SOIL_PROPERTY)
 
     ###-----Creating a color dict for all the stratigraphy present in the whole site-----  ###
-    stratigraphy_color_dict = cpt_figure_class.create_stratigraphy_color_dict(SOIL_PROPERTY)
+    #AMB comment: Why having it twice?  Why not running it once after you load data (either way)?
+    #stratigraphy_color_dict = cpt_figure_class.create_stratigraphy_color_dict(SOIL_PROPERTY)
 ###----------------------------------------------------------------------------------  ###
 
 ###-----start from the gINT database file, connect to it, retrieve the tables and load each as panda dataframe-----  ###
@@ -176,9 +178,11 @@ if load_excel_table_as_dataframe_and_merge:
     merged_SCPT = calc.merge_tables(SCPT, SCPG, SCPT_Location, SOIL_UNIT, SOIL_PROPERTY)
 
     ###-----Creating a color dict for all the stratigraphy present in the whole site-----  ###
-    stratigraphy_color_dict = cpt_figure_class.create_stratigraphy_color_dict(SOIL_PROPERTY)
+    #stratigraphy_color_dict = cpt_figure_class.create_stratigraphy_color_dict(SOIL_PROPERTY)
 ###----------------------------------------------------------------------------------  ###
 
+#Dictionary for Stratigraphy colors - need to add an if for the case where the sheet is empty - then use sc function
+stratigraphy_color_dict = dict(stratigraphy_color_input_df.values)
 
 ###-----Process CPT data with a given dataframe-----  ###
 if process_CPT:
@@ -220,8 +224,8 @@ if plot_CPT:
     # Plot side by side graphs of qc, Rf, u
     plot_list1 = [['SCPT_RES', 'qt_uncorr', 'qt_corr'], ['Rf'], ['SCPT_PWP2', 'u2_corr', 'u0']]
     color_list1 = [['#0070C0', '#4BACC6', '#6E548D'], ['#00B050'], ['#A8423F', '#00B050', '#1F497D']]
-    name_list1 = [['qc', 'qt', 'qt (corr)'], ['Rf'], ['u2', 'u2 (corr)', 'u0']]
-    xy_label_list1 = [['qc (MPa)', 'Rf (%)', 'u2 (MPa)'], ['Depth below mudline (m)']]
+    name_list1 = [[r'$q_c$', r'$q_t$', r'$q_t$ (corr)'], [r'$R_f$'], [r'$u_2$', r'$u_2$ (corr)', r'$u_0$']]
+    xy_label_list1 = [[r'$q_c$ (MPa)', r'$R_f$ (%)', r'$u_2$ (MPa)'], ['Depth below mudline (m)']]
     xy_limit_list1 = [[[0, None], [0, None], [0, None]], [None, 0]]
     multiplier_list1 = [[1, 1, 1], [1], [1, 1, 0.001]]
     template_dict1={'size':'A4-Landscape', 'client':'RWE', 'project':'RWE-Taiwan', 'clientN':'2232', 'projectN':'10001', 'issue':'Rev0', 'date':'11/7/22', 'maincaption':'CPT plot',
@@ -242,10 +246,10 @@ if plot_CPT:
                     ['peak_phi_UB', 'peak_phi_LB']]
     color_list_1a = [['#0070C0', '#4BACC6', '#6E548D'], ['#00B050'], ['#A8423F', '#00B050', '#1F497D'],
                      ['#1F497D', '#4BACC6'], ['#1F497D', '#4BACC6']]
-    name_list_1a = [['qc', 'qt', 'qt (corr)'], ['Rf'], ['u2', 'u2 (corr)', 'u0'],
+    name_list_1a = [[r'$q_c$', r'$q_t$', r'$q_t$ (corr)'], [r'$R_f$'], [r'$u_2$', r'$u_2$ (corr)', r'$u_0$'],
                     [r'$ Su_{UB}$' + '\n (Lunne et al., 1997)', r'$ Su_{LB}$' + '\n (Lunne et al., 1997)'],
                     [r'$ \phi_{Peak, UB}$' + ' (Schmertmann, 1978)', r'$ \phi_{Peak, LB}$' + ' (Schmertmann, 1978)']]
-    xy_label_list_1a = [['qc (MPa)', 'Rf (%)', 'u2 (MPa)', 'Su (kPa)', r'$ \phi (\degree)$'],
+    xy_label_list_1a = [[r'$q_c$ (MPa)', r'$R_f$ (%)', r'$u_2$ (MPa)', r'$S_u$ (kPa)', r'$ \phi (\degree)$'],
                         ['Depth below mudline (m)']]
     xy_limit_list_1a = [[[0, 50], [0, 10], [0, 2], [0, 350], [0, 50]], [None, 0]]
     multiplier_list_1a = [[1, 1, 1], [1], [1, 1, 0.001], [1, 1], [1, 1]]
@@ -268,10 +272,10 @@ if plot_CPT:
                     ['Dr_Baldi', 'Dr_Jam_sat']]
     color_list_1b = [['#0070C0', '#4BACC6', '#6E548D'], ['#00B050'], ['#A8423F', '#00B050', '#1F497D'],
                      ['#1F497D', '#4BACC6'], ['#1F497D', '#4BACC6']]
-    name_list_1b = [['qc', 'qt', 'qt (corr)'], ['Rf'], ['u2', 'u2 (corr)', 'u0'],
+    name_list_1b = [[r'$q_c$', r'$q_t$', r'$q_t$ (corr)'], [r'$R_f$'], [r'$u_2$', r'$u_2$ (corr)', r'$u_0$'],
                     [r'$ Su_{UB}$' + '\n (Lunne et al., 1997)', r'$ Su_{LB}$' + '\n (Lunne et al., 1997)'],
                     ['Dr (Baldi et al., 1986)', 'Dr saturated \n (Jamiolkowski et al., 2003)']]
-    xy_label_list_1b = [['qc (MPa)', 'Rf (%)', 'u2 (MPa)', 'Su (kPa)', 'Dr (%)'],
+    xy_label_list_1b = [[r'$q_c$ (MPa)', r'$R_f$ (%)', r'$u_2$ (MPa)', r'$S_u$ (kPa)', r'$D_r$ (%)'],
                         ['Depth below mudline (m)']]
     xy_limit_list_1b = [[[0, 50], [0, 10], [0, 2], [0, 350], [0, 100]], [None, 0]]
     multiplier_list_1b = [[1, 1, 1], [1], [1, 1, 0.001], [1, 1], [1, 1]]
@@ -288,9 +292,9 @@ if plot_CPT:
 
 
     # save the figure in GCG's template
-    fig_path = os.path.join(folder_fig, 'Graph_qc_Rf_u_Su_Dr.png')
-    fig_1b_gcg=cpt_figure_class.put_figure_in_GCG_Template_and_save(fig_path, template_dict1,)
-    cpt_figure_class.savefig(folder_fig, fig_1b_gcg, 'Graph_qc_Rf_u_Su_Dr_template', fext=ext_fig)
+    # fig_path = os.path.join(folder_fig, 'Graph_qc_Rf_u_Su_Dr'+ext_fig)
+    # fig_1b_gcg=cpt_figure_class.put_figure_in_GCG_Template_and_save(fig_path, template_dict1,)
+    # cpt_figure_class.savefig(folder_fig, fig_1b_gcg, 'Graph_qc_Rf_u_Su_Dr_template', fext=ext_fig)
 
     # Plot single plot
     plot_list2 = ['SCPT_RES', 'qt_uncorr', 'qt_corr']
@@ -311,9 +315,9 @@ if plot_CPT:
     fig2.savefig(folder_fig, 'Graph_qc_compared', fext=ext_fig)
 
     # save the figure in GCG's template
-    fig_path_2 = os.path.join(folder_fig, 'Graph_qc.png')
-    fig_2_gcg=cpt_figure_class.put_figure_in_GCG_Template_and_save(fig_path_2, template_dict2)
-    cpt_figure_class.savefig(folder_fig, fig_2_gcg, 'Graph_qc_template', fext=ext_fig)
+    # fig_path_2 = os.path.join(folder_fig, 'Graph_qc.png')
+    # fig_2_gcg=cpt_figure_class.put_figure_in_GCG_Template_and_save(fig_path_2, template_dict2)
+    # cpt_figure_class.savefig(folder_fig, fig_2_gcg, 'Graph_qc_template', fext=ext_fig)
 
     # Plots with soil stratigraphy next to it - only plot for 1 SCPT location.
     fig1_strat=CPT_figure('A4-Landscape', 'side_by_side_with_stratigraphy', plot_list1)
@@ -351,7 +355,7 @@ if plot_CPT:
     plot_list3 = ['Dr_Baldi', 'Dr_Jam_sat']
     color_list3 = ['#386192', '#FF0000']
     name_list3 = ['Dr (Baldi et al., 1986)', 'Dr saturated (Jamiolkowski et al., 2003)']
-    xy_label_list3 = [['Dr (%)'], ['Depth below mudline (m)']]
+    xy_label_list3 = [[r'$D_r$ (%)'], ['Depth below mudline (m)']]
     xy_limit_list3 = [[0, 100], [None, 0]]
     multiplier_list3 = [1, 1]
 
@@ -401,7 +405,7 @@ if plot_CPT:
     plot_list6 = ['Su_UB', 'Su_LB']
     color_list6 = ['#1F497D', '#4BACC6']
     name_list6 = [r'$ Su_{UB}$' + ' (Lunne et al., 1997)', r'$ Su_{LB}$' + ' (Lunne et al., 1997)']
-    xy_label_list6 = [['Su (kPa)'], ['Depth below mudline (m)']]
+    xy_label_list6 = [[r'$S_u$ (kPa)'], ['Depth below mudline (m)']]
     xy_limit_list6 = [[0, 500], [None, 0]]
     multiplier_list6 = [1, 1]
     fig6 = CPT_figure('A4-Portrait', 'single_plot_with_stratigraphy', plot_list6)
