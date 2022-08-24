@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import mpld3
 from matplotlib import patches
 import os
 from excel_interface.gcg_template import gcg_graph
@@ -132,6 +133,16 @@ class CPT_figure():
         f.savefig(fpath)
         return
 
+    ###----- function to save figures to specific folder-----  ###
+    # pre-define format: png
+    # def saveinteractivefigs(self, folder_fig, fname, fext='.html'):
+    #     """
+    #     Saves figure into default folder_fig (defined globally)
+    #     """
+    #     fpath = os.path.join(folder_fig, fname + fext)
+    #     mpld3.save_html(self.f,fpath)
+    #     return
+
     ###----- function to plot one graph with depth -----  ###
     def single_plot(self, df, plot_list, color_list, name_list, xy_label_list, xy_limit_list, multiplier_list):
         ax=self.axs
@@ -156,8 +167,6 @@ class CPT_figure():
         ax.xaxis.set_label_position('top')
         self.axs=ax
         self.f=f
-
-
 
     ###----- function to plot and compare data side by side with depth -----  ###
     def side_by_side(self,df, plot_list, color_list, name_list, xy_label_list, xy_limit_list, multiplier_list):
@@ -246,9 +255,12 @@ class CPT_figure():
             # get y-limit of the current axes
             bottom, top = ax.get_ylim()
             for a, limit in enumerate(classification_dict['Limit']):
-                ax.axvline(limit, color='#A6A6A6', alpha=0.7)
+                if limit==2.6:
+                    ax.axvline(limit, color='#C00000', linewidth=1.5, alpha=0.7)
+                else:
+                    ax.axvline(limit, color='#A6A6A6', alpha=0.7)
                 description = classification_dict['Description'][a]
-                ax.text(limit, bottom, description, wrap=True, fontsize=12)
+                ax.text(limit+0.03, bottom-1, description, wrap=True, fontsize=10)
 
         ax.legend(bbox_to_anchor=(0.5, 0))
         ax.grid()
