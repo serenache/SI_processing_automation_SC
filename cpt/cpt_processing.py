@@ -112,7 +112,7 @@ def calc_Qtn(qt_corr, sig_v0, eff_sig_v0, n):
     try:
         Qtn = ((1000 * qt_corr - sig_v0) / pa) * (pa / eff_sig_v0) ** n
     except:
-        Qtn=np.NaN
+        Qtn = np.NaN
     return Qtn
 
 
@@ -126,7 +126,7 @@ def calc_Ic(Fr, Qtn):
     if Fr > 0 and Qtn > 0:
         Ic = ((3.47 - np.log10(Qtn)) ** 2 + (np.log10(Fr) + 1.22) ** 2) ** 0.5
     else:
-        Ic = 100
+        Ic = np.NaN
     return Ic
 
 
@@ -138,23 +138,31 @@ def calc_n(Ic, eff_sig_v0):
 def loop_n(qt_corr, sig_v0, eff_sig_v0, Fr):
     # calculate n from iterations
     # initialise the parameters
-    n1 = 0
+    #n1 = 0
+    Ic_prev = 100
     n = 1
     max_no_iteration=100
     iteration_no=0
+    #Run one calculation of Qtn and Ic
+    Qtn_1 = calc_Qtn(qt_corr, sig_v0, eff_sig_v0, n)
+    Ic_1 = calc_Ic(Fr, Qtn_1)
 
-    while np.abs(n1 - n) > 0.0000000001:
-
+    #while np.abs(n1 - n) > 0.0000000001:
+    while np.abs(Ic_1 - Ic_prev) > 0.00000001:
         # Update n1
-        n1 = n
-        # Recalculate Qtn and Ic
-        Qtn_1 = calc_Qtn(qt_corr, sig_v0, eff_sig_v0, n1)
-        Ic_1 = calc_Ic(Fr, Qtn_1)
+        #n1 = n
+        #Update Ic_Prev
+        Ic_prev = Ic_1
         # Update n
         n = calc_n(Ic_1, eff_sig_v0)
         # check n
         if n > 1:
             n = 1
+        # Recalculate Qtn and Ic
+        #Qtn_1 = calc_Qtn(qt_corr, sig_v0, eff_sig_v0, n1)
+        Qtn_1 = calc_Qtn(qt_corr, sig_v0, eff_sig_v0, n)
+        Ic_1 = calc_Ic(Fr, Qtn_1)
+
         # update iteration number
         iteration_no = iteration_no+1
         # Check iteration_no - get out after 100 to avoid infinite loop
@@ -164,22 +172,6 @@ def loop_n(qt_corr, sig_v0, eff_sig_v0, Fr):
 
     n_looped = n
     return n_looped
-
-
-# Calculate OCR based on Qtn
-# k is preconsolidation cone factor and range of 0.2-0.5. Assume average value of k=0.33
-def calc_OCR(Qtn,k=0.33):
-    """
-
-    :param Qtn:
-    :param k:
-    :return:
-    """
-
-    OCR=k*Qtn
-    return OCR
-
-
 
 
 # ICP equation to calculate G0 for sand
@@ -196,7 +188,7 @@ def calc_G0_ICP(SOIL_CLASS, check_value, n_value, qc):
     if SOIL_CLASS == 'SAND' and 200 <= check_value <= 3000:
         G0 = qc * (0.0203 + 0.00125 * n_value - 0.000001216 * n_value ** 2) ** (-1)
     else:
-        G0 = -5
+        G0 = np.NaN
     return G0
 
 
@@ -213,7 +205,7 @@ def calc_G0_RS(SOIL_CLASS, check_value, qc):
     if SOIL_CLASS == 'SAND' and 200 <= check_value <= 10000:
         G0 = 1634 * qc * check_value ** (-0.75)
     else:
-        G0 = -5
+        G0 = np.NaN
     return G0
 
 
@@ -230,7 +222,7 @@ def calc_G0_Baldi(SOIL_CLASS, qc, UNIT_WEIGHT, eff_sig_v0):
     if SOIL_CLASS == 'SAND':
         G0 = (UNIT_WEIGHT / 9.81) * (277 * (qc ** 0.13) * (eff_sig_v0 / 1000) ** 0.27) ** 2 / 1000
     else:
-        G0 = -5
+        G0 = np.NaN
     return G0
 
 
@@ -245,9 +237,13 @@ def calc_Dr_Baldi(SOIL_CLASS, qc, eff_p):
     :return: Dr in %
     """
     if SOIL_CLASS == 'SAND':
-        Dr = np.minimum(1 / 2.61 * (np.log((qc * 1000) / (181 * (eff_p) ** 0.55))) * 100, 100)
+        try:
+            Dr = np.minimum(1 / 2.61 * (np.log((qc * 1000) / (181 * (eff_p) ** 0.55))) * 100, 100)
+        except ZeroDivisionError:
+            print('The qc and eff_p that give error = ',qc,eff_p)
+            Dr = np.NaN
     else:
-        Dr = -5
+        Dr = np.NaN
     return Dr
 
 
@@ -264,7 +260,7 @@ def calc_Dr_Jam_dry(SOIL_CLASS, qc, eff_p):
     if SOIL_CLASS == 'SAND':
         Dr = np.minimum(1 / 2.96 * (np.log((qc * 1000 / 98.1) / (24.94 * (eff_p / 98.1) ** 0.46))) * 100, 100)
     else:
-        Dr = -5
+        Dr = np.NaN
     return Dr
 
 
@@ -284,7 +280,7 @@ def calc_Dr_Jam_sat(SOIL_CLASS, check_value, qc, eff_sig_v0, Dr_dry):
     if SOIL_CLASS == 'SAND' and check_value > 2.24:
         Dr = np.minimum((1 + (-1.87 + 2.32 * np.log(qc * 1000 / (eff_sig_v0 * pa) ** 0.5)) / 100) * Dr_dry, 100)
     else:
-        Dr = -5
+        Dr = np.NaN
     return Dr
 
 
@@ -300,7 +296,7 @@ def calc_peak_phi_UB(SOIL_CLASS, Dr_Baldi):
     if SOIL_CLASS == 'SAND':
         peak_phi_UB = np.minimum(38 + 0.08 * Dr_Baldi, 38 + 8)
     else:
-        peak_phi_UB = -5
+        peak_phi_UB = np.NaN
     return peak_phi_UB
 
 
@@ -316,7 +312,7 @@ def calc_peak_phi_LB(SOIL_CLASS, Dr_Baldi):
     if SOIL_CLASS == 'SAND':
         peak_phi_LB = 28 + 0.14 * Dr_Baldi
     else:
-        peak_phi_LB = -5
+        peak_phi_LB = np.NaN
     return peak_phi_LB
 
 
@@ -334,7 +330,7 @@ def calc_Su_UB(SOIL_CLASS, qt_corr, sig_v0, Nkt_UB):
     if SOIL_CLASS == 'CLAY':
         Su_UB = np.maximum((qt_corr*1000-sig_v0)/Nkt_UB,0)
     else:
-        Su_UB = -5
+        Su_UB = np.NaN
     return Su_UB
 
 # Lunne et al equation for calculating Su (lower bound)
@@ -351,7 +347,7 @@ def calc_Su_LB(SOIL_CLASS, qt_corr, sig_v0, Nkt_LB):
     if SOIL_CLASS == 'CLAY':
         Su_LB = np.maximum((qt_corr*1000-sig_v0)/Nkt_LB,0)
     else:
-        Su_LB = -5
+        Su_LB = np.NaN
     return Su_LB
 
 
@@ -394,9 +390,10 @@ def process_CPT(df, gamma_w, G0_constants, Elev_WT=0):
     qt_uncorr = df.qt_uncorr
 
     # calculate sig_v0
-    df['d_Depth'] = df.Depth.diff().fillna(0)
-    df['d_sig_v0'] = df.d_Depth * df.UNIT_WEIGHT  # assuming that the first row is at 0m
-    df['sig_v0'] = df.d_sig_v0.cumsum()
+    # df['d_Depth'] = df.Depth.diff().fillna(0)
+    # df['d_sig_v0'] = df.d_Depth * df.UNIT_WEIGHT  # assuming that the first row is at 0m - amb I do not think we should assume that
+    # df['sig_v0'] = df.d_sig_v0.cumsum()
+    df['sig_v0'] = df.base_sigv0 + (df.Depth - df.DEPTH_BASE) * df.UNIT_WEIGHT
     sig_v0 = df.sig_v0
 
     # calculate u0 and eff_sig_v0
@@ -443,10 +440,7 @@ def process_CPT(df, gamma_w, G0_constants, Elev_WT=0):
     # calculate p'
     df['eff_p'] = (eff_sig_v0 + 2 * K0 * eff_sig_v0) / 3
     eff_p = df.eff_p
-
-    #Calculate OCR based on Qtn
-    df['OCR'] =calc_OCR(Qtn, k=0.33)
-    OCR=df.OCR
+    #print(df[['eff_sig_v0','eff_p']])
 
     # Calculate G0
     # Preliminary parameters fro checking
@@ -555,47 +549,123 @@ def add_locationID(SCPG, SOIL_UNIT):
         lambda row_SOIL_UNIT: assign_Location_ID(row_SOIL_UNIT['PointID'], SCPG), axis=1)
     return SOIL_UNIT
 
-
-# Add soil unit to each row of data
-def assign_soil_unit(row_SCPT_depth, row_SCPT_LocationID, SOIL_UNIT):
-    for i, rows in SOIL_UNIT.iterrows():
-        row_soil = rows.to_frame().transpose()
-        if row_soil['Location_ID'].values[0] == row_SCPT_LocationID:
-            if row_soil.Depth.values < row_SCPT_depth < row_soil.DEPTH_BASE.values:
-                geol_unit = row_soil.GEOL_UNIT.values[0]
-                return geol_unit
-                break
-
-def add_soil_unit(first_merge_SCPT, SOIL_UNIT):
-    first_merge_SCPT['GEOL_UNIT'] = first_merge_SCPT.apply(
-        lambda row_SCPT: assign_soil_unit(row_SCPT['Depth'], row_SCPT['Location_ID'], SOIL_UNIT), axis=1)
-
-    return first_merge_SCPT
-
-#function to Merge SCPT with soil unit and soil properties tables
-# need to change column name of the three tables to ensure they all call GEOL_unit
-# need to change the 'Depth' column in SOIL_UNIT to avoid conflict
-# https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
-def third_merge(assigned_SCPT, SOIL_UNIT, SOIL_PROPERTY):
+#merge soil unit with unit property
+def merge_soil_profiles(SOIL_UNIT,SOIL_PROPERTY):
+    '''
+    Function to add the soil property of each layers to the
+    soil profiles for each location point. Note that the function
+    create a new 'UNIQUE_GEOL' feature that create a unique reference
+    for each layer in the profile (even if they belong to the same identified unit
+    :param SOIL_UNIT: dataframe that includes the soil profiles for different PointID
+    :param SOIL_PROPERTY: dataframe the that includes the property for each soil unit
+    :return: dataframe of the geological profilles with added soil properties
+    '''
+    #AMB - this is a general function that will need to be moved out of CPT later
     try:
         SOIL_UNIT_cleaned = SOIL_UNIT.drop(['GintRecID'], axis=1)
     except:
         SOIL_UNIT_cleaned= SOIL_UNIT
     SOIL_UNIT_renamed = SOIL_UNIT_cleaned.rename(columns={'ItemKey': 'GEOL_UNIT', 'Depth': 'DEPTH_TOP'})
     SOIL_PROPERTY_renamed = SOIL_PROPERTY.rename(columns={'ItemKey': 'GEOL_UNIT'})
-    second_merge = pd.merge(assigned_SCPT, SOIL_UNIT_renamed, how="left", on=["GEOL_UNIT","Location_ID"])
-    merged_SCPT = pd.merge(second_merge, SOIL_PROPERTY_renamed, how="left", on="GEOL_UNIT")
+    SOIL_UNIT_renamed['UNIQUE_GEOL'] = SOIL_UNIT_renamed.GEOL_UNIT+"_"+SOIL_UNIT_renamed.index.astype(str)
+    merge_table = pd.merge(SOIL_UNIT_renamed,SOIL_PROPERTY_renamed, how="left", on=["GEOL_UNIT"])
+    return merge_table.sort_values(by=['Location_ID','PointID','DEPTH_TOP'])
+
+def calc_sigv0_base_layer(df):
+    '''
+    Calculate the total vertical stress at the base of a layer
+    :param df: dataframe that includes the soil profiles with associated soil
+               soil properties (i.e. merged of soil profiles and soil properties)
+    :return: nothing - the function directly add a column to the input dataframe
+    '''
+    # AMB - this is a general function that will need to be moved out of CPT later
+    df['inc_sigv0'] = ((df.DEPTH_BASE-df.DEPTH_TOP)*df.UNIT_WEIGHT)
+    df['base_sigv0'] = np.nan
+    for point in df.PointID.unique():
+        min_depth = df[df['PointID'] == point]['DEPTH_TOP'].min()
+        if  min_depth == 0:
+            df.loc[df['PointID'] == point,['base_sigv0']] = df[df['PointID'] == point].inc_sigv0.cumsum()
+        else: # for cases where the profile does not start from 0
+            #AMB - probably not the smartest way to do this - need to think
+            location = df[df['PointID'] == point]['Location_ID'].iloc[0]
+            inter_df = df.loc[(df['Location_ID']==location) & (df['DEPTH_BASE'] < min_depth)]
+            closest_depth= inter_df['DEPTH_BASE'].iloc[-1]
+            closest_base_sigV = inter_df['base_sigv0'].iloc[-1]
+            df.loc[(df['PointID'] == point) & (df['DEPTH_TOP'] == min_depth), ['inc_sigv0']] = (closest_base_sigV +
+                                                                    (df[df['PointID'] == point]['DEPTH_BASE'].iloc[0]-closest_depth)*
+                                                                    df[df['PointID'] == point]['UNIT_WEIGHT'].iloc[0])
+            df.loc[df['PointID'] == point, ['base_sigv0']] = df[df['PointID'] == point].inc_sigv0.cumsum()
+
+# Add soil unit to each row of data
+# def assign_soil_unit(row_SCPT_depth, row_SCPT_LocationID, SOIL_UNIT):
+#     for i, rows in SOIL_UNIT.iterrows():
+#         row_soil = rows.to_frame().transpose()
+#         if row_soil['Location_ID'].values[0] == row_SCPT_LocationID:
+#             if row_soil.Depth.values < row_SCPT_depth < row_soil.DEPTH_BASE.values:
+#                 geol_unit = row_soil.GEOL_UNIT.values[0]
+#                 return geol_unit
+#                 break
+
+def assign_soil_unit(row_SCPT_depth, row_SCPT_LocationID, SOIL_UNIT):
+    for i, rows in SOIL_UNIT.iterrows():
+        row_soil = rows.to_frame().transpose()
+        if row_soil['CPT_name'].values[0] == row_SCPT_LocationID:
+            if row_soil.DEPTH_TOP.values < row_SCPT_depth < row_soil.DEPTH_BASE.values:
+                geol_unit = row_soil.UNIQUE_GEOL.values[0]
+                return geol_unit
+                break
+
+# def add_soil_unit(first_merge_SCPT, SOIL_UNIT):
+#     first_merge_SCPT['GEOL_UNIT'] = first_merge_SCPT.apply(
+#         lambda row_SCPT: assign_soil_unit(row_SCPT['Depth'], row_SCPT['Location_ID'], SOIL_UNIT), axis=1)
+#     return first_merge_SCPT
+
+def add_soil_unit(first_merge_SCPT, SOIL_UNIT):
+    first_merge_SCPT['UNIQUE_GEOL'] = first_merge_SCPT.apply(
+        lambda row_SCPT: assign_soil_unit(row_SCPT['Depth'], row_SCPT['CPT_name'], SOIL_UNIT), axis=1)
+    return first_merge_SCPT
+
+#function to Merge SCPT with soil unit and soil properties tables
+# need to change column name of the three tables to ensure they all call GEOL_unit
+# need to change the 'Depth' column in SOIL_UNIT to avoid conflict
+# https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
+# def third_merge(assigned_SCPT, SOIL_UNIT, SOIL_PROPERTY):
+#     try:
+#         SOIL_UNIT_cleaned = SOIL_UNIT.drop(['GintRecID'], axis=1)
+#     except:
+#         SOIL_UNIT_cleaned= SOIL_UNIT
+#     SOIL_UNIT_renamed = SOIL_UNIT_cleaned.rename(columns={'ItemKey': 'GEOL_UNIT', 'Depth': 'DEPTH_TOP'})
+#     SOIL_PROPERTY_renamed = SOIL_PROPERTY.rename(columns={'ItemKey': 'GEOL_UNIT'})
+#     second_merge = pd.merge(assigned_SCPT, SOIL_UNIT_renamed, how="left", on=["GEOL_UNIT","Location_ID"])
+#     merged_SCPT = pd.merge(second_merge, SOIL_PROPERTY_renamed, how="left", on="GEOL_UNIT")
+#     return merged_SCPT
+
+def third_merge(assigned_SCPT, SOIL_UNIT):
+    merged_SCPT = pd.merge(assigned_SCPT, SOIL_UNIT, how="left", on=["UNIQUE_GEOL","Location_ID","CPT_name"])
     return merged_SCPT
 
 # function to perform all merges#
+# def merge_tables(SCPT, SCPG, SCPT_Location, SOIL_UNIT, SOIL_PROPERTY):
+#     # merging of the table
+#     first_merge_SCPT = merge_SCPT_SCPG(SCPT, SCPG)
+#     SOIL_UNIT_with_LocationID = add_locationID(SCPG, SOIL_UNIT)
+#     selected_SCPT = first_merge_SCPT[(first_merge_SCPT.Location_ID.isin(SCPT_Location))]
+#     SCPT_sorted = selected_SCPT.sort_values(by=['Location_ID','Depth']) #AMB - may be it should be Location_ID, CPT_name, Depth - there may be some overlap in depth.
+#     assigned_SCPT = add_soil_unit(SCPT_sorted, SOIL_UNIT_with_LocationID)
+#     merged_SCPT = third_merge(assigned_SCPT, SOIL_UNIT_with_LocationID, SOIL_PROPERTY)
+#     return merged_SCPT
+
 def merge_tables(SCPT, SCPG, SCPT_Location, SOIL_UNIT, SOIL_PROPERTY):
+    SOIL_UNIT_with_LocationID = add_locationID(SCPG, SOIL_UNIT)
+    SOIL_UNIT_with_Property = merge_soil_profiles(SOIL_UNIT_with_LocationID,SOIL_PROPERTY)
+    calc_sigv0_base_layer(SOIL_UNIT_with_Property)
+    SOIL_UNIT_with_Property = SOIL_UNIT_with_Property.rename(columns={'PointID': 'CPT_name'})
     # merging of the table
     first_merge_SCPT = merge_SCPT_SCPG(SCPT, SCPG)
-    SOIL_UNIT_with_LocationID = add_locationID(SCPG, SOIL_UNIT)
     selected_SCPT = first_merge_SCPT[(first_merge_SCPT.Location_ID.isin(SCPT_Location))]
-    SCPT_sorted = selected_SCPT.sort_values(by=['Location_ID','Depth'])
-    assigned_SCPT = add_soil_unit(SCPT_sorted, SOIL_UNIT_with_LocationID)
-    merged_SCPT = third_merge(assigned_SCPT, SOIL_UNIT_with_LocationID, SOIL_PROPERTY)
+    SCPT_sorted = selected_SCPT.sort_values(by=['Location_ID','CPT_name','Depth'])
+    assigned_SCPT = add_soil_unit(SCPT_sorted, SOIL_UNIT_with_Property)
+    merged_SCPT = third_merge(assigned_SCPT, SOIL_UNIT_with_Property)
     return merged_SCPT
 
 ###----------------------------------------------------------------------------------  ###
