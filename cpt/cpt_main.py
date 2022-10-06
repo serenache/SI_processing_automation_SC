@@ -235,6 +235,23 @@ if plot_CPT:
     fig1.add_CPT_to_plot(df, plot_list1, color_list1_other, name_list1, xy_label_list1, xy_limit_list1, multiplier_list1, list_of_other_CPT)
     fig1.savefig(folder_fig, 'Graph_qc_Rf_u_compared', fext=ext_fig)
 
+    # Plot side by side graphs of qc, Rf, u
+    plot_list1_OCR = [['SCPT_RES', 'qt_uncorr', 'qt_corr'], ['Rf'], ['SCPT_PWP2', 'u2_corr', 'u0'],['OCR']]
+    color_list1_OCR = [['#0070C0', '#4BACC6', '#6E548D'], ['#00B050'], ['#A8423F', '#00B050', '#1F497D'],['#A8423F']]
+    name_list1_OCR = [['qc', 'qt', 'qt (corr)'], ['Rf'], ['u2', 'u2 (corr)', 'u0'],['OCR']]
+    xy_label_list1_OCR = [['qc (MPa)', 'Rf (%)', 'u2 (MPa)','OCR'], ['Depth below mudline (m)']]
+    xy_limit_list1_OCR = [[[0, None], [0, None], [0, None], [0, 20]], [None, 0]]
+    multiplier_list1_OCR = [[1, 1, 1], [1], [1, 1, 0.001],[1]]
+    fig1_OCR=CPT_figure('A4-Landscape','side_by_side',plot_list1_OCR)
+    fig1_OCR.side_by_side(df_main, plot_list1_OCR, color_list1_OCR, name_list1_OCR, xy_label_list1_OCR, xy_limit_list1_OCR, multiplier_list1_OCR)
+    fig1_OCR.savefig(folder_fig,'Graph_qc_Rf_u_OCR', fext=ext_fig)
+
+    #Plot other CPT locations to side by side graphs of qc, Rf, u, and compare
+    color_list1_other = [['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A']]
+    fig1.add_CPT_to_plot(df, plot_list1, color_list1_other, name_list1, xy_label_list1, xy_limit_list1, multiplier_list1, list_of_other_CPT)
+    fig1.savefig(folder_fig, 'Graph_qc_Rf_u_compared', fext=ext_fig)
+
+
 
 
     # Plot side by side graphs of qc, Rf, u, Su, phi

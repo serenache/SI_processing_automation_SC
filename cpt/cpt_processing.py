@@ -166,6 +166,22 @@ def loop_n(qt_corr, sig_v0, eff_sig_v0, Fr):
     return n_looped
 
 
+# Calculate OCR based on Qtn
+# k is preconsolidation cone factor and range of 0.2-0.5. Assume average value of k=0.33
+def calc_OCR(Qtn,k=0.33):
+    """
+
+    :param Qtn:
+    :param k:
+    :return:
+    """
+
+    OCR=k*Qtn
+    return OCR
+
+
+
+
 # ICP equation to calculate G0 for sand
 # only valid for qc/(sig'v0)^0.5= 200 to 3000
 def calc_G0_ICP(SOIL_CLASS, check_value, n_value, qc):
@@ -428,7 +444,9 @@ def process_CPT(df, gamma_w, G0_constants, Elev_WT=0):
     df['eff_p'] = (eff_sig_v0 + 2 * K0 * eff_sig_v0) / 3
     eff_p = df.eff_p
 
-
+    #Calculate OCR based on Qtn
+    df['OCR'] =calc_OCR(Qtn, k=0.33)
+    OCR=df.OCR
 
     # Calculate G0
     # Preliminary parameters fro checking
