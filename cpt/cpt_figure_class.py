@@ -216,14 +216,16 @@ class CPT_figure():
         cleaned_list = [x for x in list_of_other_CPT if str(x) != 'nan']
         fig_type = self.fig_type
         for i, cpt_location in enumerate(cleaned_list):
+            print(i)
             option = [cpt_location, np.nan]
             df_selected = df[df['Location_ID'].isin(option)]
             if fig_type == 'single_plot':
-                self.single_plot(df_selected, plot_list, color_list, name_list, xy_label_list, xy_limit_list,
+                self.single_plot(df_selected, plot_list, color_list[i], name_list, xy_label_list, xy_limit_list,
                                  multiplier_list)
             if fig_type == 'side_by_side':
-                self.side_by_side(df_selected, plot_list, color_list, name_list, xy_label_list, xy_limit_list,
+                self.side_by_side(df_selected, plot_list, color_list[i], name_list, xy_label_list, xy_limit_list,
                                   multiplier_list)
+
 
     ###----- function to plot single plot, with a stratigraphy column,
     # and horizontal line separating each stratigraphy-----  ###

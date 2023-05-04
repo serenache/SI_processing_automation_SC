@@ -288,7 +288,9 @@ for i in range(len(global_variable_df)):
             'su': [r'Undrained Strength (kPa)',r'$S_u \mathrm{ (kPa)}$'],
             'dr': [r'Relative density (%)', r'$D_r \mathrm{ (\%)}$'],
             'go': [r'Shear modulus (MPa)', r'$G_{0} \mathrm{ (MPa)}$'],
-            'ic': [r'$I_c \mathrm{ values}$',r'$I_c \mathrm{ values}$']
+            'ic': [r'$I_c \mathrm{ values}$',r'$I_c \mathrm{ values}$'],
+            'eff_sig_y': [r'Yield stress (kPa)',r'$\sigma^''_y \mathrm{ (kPa)}$'],
+            'OCR': [r'OCR', 'OCR']
             }
 
         #Dictionary for plot label (related to plot column name) - [mplt,bokeh]
@@ -313,7 +315,11 @@ for i in range(len(global_variable_df)):
             'G0_E'      : [r'$ G_{0}/p^{0.5}$' + '={}'.format(G0_constants['A'][4]), r'$ G0/p^0.5' + '={}'.format(G0_constants['A'][4])],
             'G0_RS'     : [r'$ G_{0}$' + ' Rix & Stokoe (1992)',r'$Rix & Stokoe (1992)'],
             'G0_ICP'    : [r'$ G_{0}$' + ' Jardine et al. (2005)',r'$Jardine et al. (2005)'],
-            'Ic'        : ['r$I_c$',r'Ic']
+            'Ic'        : ['r$I_c$',r'Ic'],
+            'eff_sig_y_UB' : [r'$\sigma^''_{y, UB}',r'eff_sig_y (UB)'],
+            'eff_sig_y_LB': [r'$\sigma^''_{y, LB}', r'eff_sig_y (LB)'],
+            'OCR_UB': [r'OCR (UB)', r'OCR (UB)'],
+            'OCR_LB': [r'OCR (LB)', r'OCR (LB)']
         }
 
         # define the soil unit table for plotting stratigraphy
@@ -335,6 +341,7 @@ for i in range(len(global_variable_df)):
         fig1=CPT_figure('A4-Landscape','side_by_side',plot_list1)
         fig1.side_by_side(df_main, plot_list1, color_list1, name_list1, xy_label_list1, xy_limit_list1, multiplier_list1)
         fig1.savefig(folder_fig,'Graph_qc_Rf_u', fext=ext_fig)
+
         #amb - Try interactive plotting with bokeh
         fig1_i = plot.side_by_side_interactive_plot(df, plot_list1, plot_color_dict, name_list1,
                                                     xy_label_list1, xy_limit_list1, multiplier_list1,
@@ -343,7 +350,7 @@ for i in range(len(global_variable_df)):
         #Plot other CPT locations to side by side graphs of qc, Rf, u, and compare
         #AMB - I think it is best to create a new different figure for that.
         if len(SCPT_Location)>1:
-            color_list1_other = [['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A']]
+            color_list1_other = [[['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A']],[['#E09448', '#5C3610', '#F2D1B0'] , ['#AFF3BA'], ['#E09448', '#5C3610', '#F2D1B0']]]
             fig1.add_CPT_to_plot(df, plot_list1, color_list1_other, name_list1, xy_label_list1, xy_limit_list1, multiplier_list1, list_of_other_CPT)
             fig1.savefig(folder_fig, 'Graph_qc_Rf_u_compared', fext=ext_fig)
 
@@ -377,8 +384,8 @@ for i in range(len(global_variable_df)):
 
         #Plot other CPT locations to side by side graphs of qc, Rf, u, Su, phi and compare
         if len(SCPT_Location)>1:
-            color_list_1a_other = [['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A'],
-                             ['#641E16', '#C0392B'], ['#641E16', '#C0392B']]
+            color_list_1a_other = [[['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A'],
+                             ['#641E16', '#C0392B'], ['#641E16', '#C0392B']],[['#E09448', '#5C3610', '#F2D1B0'] , ['#AFF3BA'], ['#E09448', '#5C3610', '#F2D1B0'],['#E09448', '#5C3610'],['#E09448', '#5C3610']]]
             fig_1a.add_CPT_to_plot(df, plot_list_1a, color_list_1a_other, name_list_1a, xy_label_list_1a, xy_limit_list_1a,
                                        multiplier_list_1a, list_of_other_CPT)
             fig_1a.savefig(folder_fig, 'Graph_qc_Rf_u_Su_phi_compared', fext=ext_fig)
@@ -422,6 +429,34 @@ for i in range(len(global_variable_df)):
         # cpt_figure_class.savefig(folder_fig, fig_1b_gcg, 'Graph_qc_Rf_u_Su_Dr_template', fext=ext_fig)
 
         #-------------------------------------------------------------------------------------------------------------------
+        # Plot side by side graphs of qc, eff_sig_y, OCR
+        plot_list1c = [['SCPT_RES', 'qt_uncorr', 'qt_corr'], ['eff_sig_y_UB','eff_sig_y_LB'], ['OCR_UB','OCR_LB']]
+        color_list1c = [['#0070C0', '#4BACC6', '#6E548D'], ['#ED7D31','#FFFF66'], ['#ED7D31','#FFFF66']]
+        name_list1c = plot.get_label_list(plot_list1c, plot_label_dict, 0)
+        xy_label_list = [['qc', 'eff_sig_y', 'OCR'], ['depth']]
+        xy_label_list1c = plot.get_label_list(xy_label_list, axis_label_dict, 0)
+        xy_limit_list1c = [[[0, None], [0, None], [0, 5]], [None, 0]]
+        multiplier_list1c = [[1, 1, 1], [1,1], [1,1]]
+        fig1c=CPT_figure('A4-Landscape','side_by_side',plot_list1c)
+        fig1c.side_by_side(df_main, plot_list1c, color_list1c, name_list1c, xy_label_list1c, xy_limit_list1c, multiplier_list1c)
+        fig1c.savefig(folder_fig,'Graph_qc_sigy_OCR', fext=ext_fig)
+
+        #amb - Try interactive plotting with bokeh
+        fig1c_i = plot.side_by_side_interactive_plot(df, plot_list1c, plot_color_dict, name_list1c,
+                                                    xy_label_list1c, xy_limit_list1c, multiplier_list1c,
+                                                    SOIL_UNIT_TABLE, stratigraphy_color_dict)
+        plot.save_interactive_fig(fig1c_i,folder_fig,'Graph_qc_sigy_OCR')
+        #Plot other CPT locations to side by side graphs of qc, Rf, u, and compare
+        #AMB - I think it is best to create a new different figure for that.
+        if len(SCPT_Location)>1:
+            color_list1c_other = [[['#641E16', '#C0392B', '#F1948A'] ,['#4472C4','#66FFFF'], ['#4472C4','#66FFFF']],[['#A8423F', '#00B050', '#1F497D'],['#70AD47','#CCFFCC'],['#70AD47','#CCFFCC']],[['#641E16', '#C0392B', '#F1948A'] ,['#4472C4','#66FFFF']]]
+            fig1c.add_CPT_to_plot(df, plot_list1c, color_list1c_other, name_list1c, xy_label_list1c, xy_limit_list1c, multiplier_list1c, list_of_other_CPT)
+            fig1c.savefig(folder_fig, 'Graph_qc_sigy_OCR_compared', fext=ext_fig)
+
+
+
+
+        #-------------------------------------------------------------------------------------------------------------------
         # Plot single plot
         plot_list2 = ['SCPT_RES', 'qt_uncorr', 'qt_corr']
         color_list2 = ['#0070C0', '#4BACC6', '#6E548D']
@@ -442,11 +477,7 @@ for i in range(len(global_variable_df)):
                                               xy_label_list2, xy_limit_list2, multiplier_list2,
                                               SOIL_UNIT_TABLE, stratigraphy_color_dict)
         plot.save_interactive_fig(fig2_i,folder_fig, 'Graph_qc')
-        # Plot other CPT locations to single plot
-        if len(SCPT_Location) > 1:
-            color_list2_other = ['#641E16', '#C0392B', '#F1948A']
-            fig2.add_CPT_to_plot(df, plot_list2, color_list2_other, name_list2, xy_label_list2, xy_limit_list2, multiplier_list2, list_of_other_CPT)
-            fig2.savefig(folder_fig, 'Graph_qc_compared', fext=ext_fig)
+
 
         # save the figure in GCG's template
         # fig_path_2 = os.path.join(folder_fig, 'Graph_qc.png')

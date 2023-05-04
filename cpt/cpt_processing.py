@@ -62,6 +62,44 @@ def calc_u2_corr(u2, u0b):
     return u2_corr
 
 
+# Calculate yeild stress based on qt (based on Mayne 2014)
+def calc_eff_sig_y_UB(qt_corr, sig_v0,m=1):
+    """
+
+    :param qt_corr: in MPa
+    :param sig_v0: in kPa
+    :param m: Parameter m: 0.72 in clean quartz to silica sands. 0.8 in silty sands. 0.85 in silts. 0.9 in organic and sensitive fine grained soils. 1 in intact clays of low sensitivity. 1.1 for fissured clays.
+     Can also be calculated by m=1-(0.28/(1+(Ic/2.65)^25)
+    :return: in kPa
+    """
+    # if SOIL_CLASS == 'CLAY':
+    #     m=1
+
+    eff_sig_y_UB = 0.33 * ((qt_corr * 1000 - sig_v0) ** m) * (pa / 100) ** (1 - m)
+
+    return eff_sig_y_UB
+
+
+# Calculate yeild stress based on qt (based on Mayne 2014)
+def calc_eff_sig_y_LB(qt_corr, sig_v0, m=0.72):
+    """
+
+    :param qt_corr: in MPa
+    :param sig_v0: in kPa
+    :param SOIL_CLASS: Parameter m: 0.72 in clean quartz to silica sands. 0.8 in silty sands. 0.85 in silts. 0.9 in organic and sensitive fine grained soils. 1 in intact clays of low sensitivity. 1.1 for fissured clays.
+     Can also be calculated by m=1-(0.28/(1+(Ic/2.65)^25)
+    :return: in kPa
+    """
+    # if SOIL_CLASS == 'SAND':
+    #     m=0.72
+
+    eff_sig_y_LB = 0.33 * ((qt_corr * 1000 - sig_v0) ** m) * (pa / 100) ** (1 - m)
+
+    return eff_sig_y_LB
+
+
+
+
 def calc_Fr(fs, qt_corr, sig_v0):
     """
 
@@ -179,13 +217,13 @@ def loop_n(qt_corr, sig_v0, eff_sig_v0, Fr):
 def calc_G0_ICP(SOIL_CLASS, check_value, n_value, qc):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param check_value:
     :param n_value:
     :param qc: in MPa
     :return: G0 in MPa
     """
-    if SOIL_CLASS == 'SAND' and 200 <= check_value <= 3000:
+    if SOIL_CLASS == 'SAND'or SOIL_CLASS == 'SILT' and 200 <= check_value <= 3000:
         G0 = qc * (0.0203 + 0.00125 * n_value - 0.000001216 * n_value ** 2) ** (-1)
     else:
         G0 = np.NaN
@@ -197,12 +235,12 @@ def calc_G0_ICP(SOIL_CLASS, check_value, n_value, qc):
 def calc_G0_RS(SOIL_CLASS, check_value, qc):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param check_value:
     :param qc: in MPa
     :return: G0 in MPa
     """
-    if SOIL_CLASS == 'SAND' and 200 <= check_value <= 10000:
+    if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT' and 200 <= check_value <= 10000:
         G0 = 1634 * qc * check_value ** (-0.75)
     else:
         G0 = np.NaN
@@ -213,13 +251,13 @@ def calc_G0_RS(SOIL_CLASS, check_value, qc):
 def calc_G0_Baldi(SOIL_CLASS, qc, UNIT_WEIGHT, eff_sig_v0):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param qc: in MPa
     :param UNIT_WEIGHT:
     :param eff_sig_v0: in kPa
     :return: G0 in MPa
     """
-    if SOIL_CLASS == 'SAND':
+    if SOIL_CLASS == 'SAND'or SOIL_CLASS == 'SILT':
         G0 = (UNIT_WEIGHT / 9.81) * (277 * (qc ** 0.13) * (eff_sig_v0 / 1000) ** 0.27) ** 2 / 1000
     else:
         G0 = np.NaN
@@ -231,12 +269,12 @@ def calc_G0_Baldi(SOIL_CLASS, qc, UNIT_WEIGHT, eff_sig_v0):
 def calc_Dr_Baldi(SOIL_CLASS, qc, eff_p):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param qc: in kPa
     :param eff_p: in kPa
     :return: Dr in %
     """
-    if SOIL_CLASS == 'SAND':
+    if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT':
         try:
             Dr = np.minimum(1 / 2.61 * (np.log((qc * 1000) / (181 * (eff_p) ** 0.55))) * 100, 100)
         except ZeroDivisionError:
@@ -252,12 +290,12 @@ def calc_Dr_Baldi(SOIL_CLASS, qc, eff_p):
 def calc_Dr_Jam_dry(SOIL_CLASS, qc, eff_p):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param qc: in kPa
     :param eff_p: in kPa
     :return: Dr in %
     """
-    if SOIL_CLASS == 'SAND':
+    if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT':
         Dr = np.minimum(1 / 2.96 * (np.log((qc * 1000 / 98.1) / (24.94 * (eff_p / 98.1) ** 0.46))) * 100, 100)
     else:
         Dr = np.NaN
@@ -270,14 +308,14 @@ def calc_Dr_Jam_dry(SOIL_CLASS, qc, eff_p):
 def calc_Dr_Jam_sat(SOIL_CLASS, check_value, qc, eff_sig_v0, Dr_dry):
     """
 
-    :param SOIL_CLASS:either SAND or CLAY
+    :param SOIL_CLASS:either SAND, SILT or CLAY
     :param check_value:
     :param qc: in kPa
     :param eff_sig_v0: in kPa
     :param Dr_dry: in %
     :return:Dr in %
     """
-    if SOIL_CLASS == 'SAND' and check_value > 2.24:
+    if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT' and check_value > 2.24:
         Dr = np.minimum((1 + (-1.87 + 2.32 * np.log(qc * 1000 / (eff_sig_v0 * pa) ** 0.5)) / 100) * Dr_dry, 100)
     else:
         Dr = np.NaN
@@ -289,11 +327,11 @@ def calc_Dr_Jam_sat(SOIL_CLASS, check_value, qc, eff_sig_v0, Dr_dry):
 def calc_peak_phi_UB(SOIL_CLASS, Dr_Baldi):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT, or CLAY
     :param Dr_Baldi: in %
     :return: in degree
     """
-    if SOIL_CLASS == 'SAND':
+    if SOIL_CLASS == 'SAND'or SOIL_CLASS == 'SILT':
         peak_phi_UB = np.minimum(38 + 0.08 * Dr_Baldi, 38 + 8)
     else:
         peak_phi_UB = np.NaN
@@ -305,11 +343,11 @@ def calc_peak_phi_UB(SOIL_CLASS, Dr_Baldi):
 def calc_peak_phi_LB(SOIL_CLASS, Dr_Baldi):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param Dr_Baldi: in %
     :return: in degree
     """
-    if SOIL_CLASS == 'SAND':
+    if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT':
         peak_phi_LB = 28 + 0.14 * Dr_Baldi
     else:
         peak_phi_LB = np.NaN
@@ -321,13 +359,13 @@ def calc_peak_phi_LB(SOIL_CLASS, Dr_Baldi):
 def calc_Su_UB(SOIL_CLASS, qt_corr, sig_v0, Nkt_UB):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param qt_corr: in Mpa
     :param sig_v0: in kPa
     :param Nkt_UB:
     :return: in kPa
     """
-    if SOIL_CLASS == 'CLAY':
+    if SOIL_CLASS == 'CLAY'or SOIL_CLASS == 'SILT':
         Su_UB = np.maximum((qt_corr*1000-sig_v0)/Nkt_UB,0)
     else:
         Su_UB = np.NaN
@@ -338,13 +376,13 @@ def calc_Su_UB(SOIL_CLASS, qt_corr, sig_v0, Nkt_UB):
 def calc_Su_LB(SOIL_CLASS, qt_corr, sig_v0, Nkt_LB):
     """
 
-    :param SOIL_CLASS: either SAND or CLAY
+    :param SOIL_CLASS: either SAND, SILT or CLAY
     :param qt_corr: in Mpa
     :param sig_v0: in kPa
     :param Nkt_LB:
     :return: in kPa
     """
-    if SOIL_CLASS == 'CLAY':
+    if SOIL_CLASS == 'CLAY' or SOIL_CLASS == 'SILT':
         Su_LB = np.maximum((qt_corr*1000-sig_v0)/Nkt_LB,0)
     else:
         Su_LB = np.NaN
@@ -414,6 +452,16 @@ def process_CPT(df, gamma_w, G0_constants, Elev_WT=0):
     u2_corr = df.u2_corr
     df['qt_corr'] = calc_qt_corr(qc, u2, a, u0b)
     qt_corr = df.qt_corr
+
+    # calculate yield stress and OCR (Mayne 2014)
+    df['eff_sig_y_UB'] = df.apply(lambda row: calc_eff_sig_y_UB(row['qt_corr'], row['sig_v0']), axis=1)
+    eff_sig_y_UB = df.eff_sig_y_UB
+
+    df['eff_sig_y_LB'] = df.apply(lambda row: calc_eff_sig_y_LB(row['qt_corr'], row['sig_v0']), axis=1)
+    eff_sig_y_LB = df.eff_sig_y_LB
+
+    df['OCR_UB'] = eff_sig_y_UB / eff_sig_v0
+    df['OCR_LB'] = eff_sig_y_LB/eff_sig_v0
 
     # calculate Fr
     df['Fr'] = calc_Fr(fs, qt_corr, sig_v0)
