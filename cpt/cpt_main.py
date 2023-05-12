@@ -349,10 +349,10 @@ for i in range(len(global_variable_df)):
         plot.save_interactive_fig(fig1_i,folder_fig,'Graph_qc_Rf_u')
         #Plot other CPT locations to side by side graphs of qc, Rf, u, and compare
         #AMB - I think it is best to create a new different figure for that.
-        if len(SCPT_Location)>1:
-            color_list1_other = [[['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A']],[['#E09448', '#5C3610', '#F2D1B0'] , ['#AFF3BA'], ['#E09448', '#5C3610', '#F2D1B0']]]
-            fig1.add_CPT_to_plot(df, plot_list1, color_list1_other, name_list1, xy_label_list1, xy_limit_list1, multiplier_list1, list_of_other_CPT)
-            fig1.savefig(folder_fig, 'Graph_qc_Rf_u_compared', fext=ext_fig)
+        # if len(SCPT_Location)>1:
+        #     color_list1_other = [[['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A']],[['#E09448', '#5C3610', '#F2D1B0'] , ['#AFF3BA'], ['#E09448', '#5C3610', '#F2D1B0']]]
+        #     fig1.add_CPT_to_plot(df, plot_list1, color_list1_other, name_list1, xy_label_list1, xy_limit_list1, multiplier_list1, list_of_other_CPT)
+        #     fig1.savefig(folder_fig, 'Graph_qc_Rf_u_compared', fext=ext_fig)
 
 
 
@@ -383,12 +383,12 @@ for i in range(len(global_variable_df)):
         plot.save_interactive_fig(fig1a_i,folder_fig, 'Graph_qc_Rf_u_Su_phi')
 
         #Plot other CPT locations to side by side graphs of qc, Rf, u, Su, phi and compare
-        if len(SCPT_Location)>1:
-            color_list_1a_other = [[['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A'],
-                             ['#641E16', '#C0392B'], ['#641E16', '#C0392B']],[['#E09448', '#5C3610', '#F2D1B0'] , ['#AFF3BA'], ['#E09448', '#5C3610', '#F2D1B0'],['#E09448', '#5C3610'],['#E09448', '#5C3610']]]
-            fig_1a.add_CPT_to_plot(df, plot_list_1a, color_list_1a_other, name_list_1a, xy_label_list_1a, xy_limit_list_1a,
-                                       multiplier_list_1a, list_of_other_CPT)
-            fig_1a.savefig(folder_fig, 'Graph_qc_Rf_u_Su_phi_compared', fext=ext_fig)
+        # if len(SCPT_Location)>1:
+        #     color_list_1a_other = [[['#641E16', '#C0392B', '#F1948A'] , ['#641E16'], ['#641E16', '#C0392B', '#F1948A'],
+        #                      ['#641E16', '#C0392B'], ['#641E16', '#C0392B']],[['#E09448', '#5C3610', '#F2D1B0'] , ['#AFF3BA'], ['#E09448', '#5C3610', '#F2D1B0'],['#E09448', '#5C3610'],['#E09448', '#5C3610']]]
+        #     fig_1a.add_CPT_to_plot(df, plot_list_1a, color_list_1a_other, name_list_1a, xy_label_list_1a, xy_limit_list_1a,
+        #                                multiplier_list_1a, list_of_other_CPT)
+        #     fig_1a.savefig(folder_fig, 'Graph_qc_Rf_u_Su_phi_compared', fext=ext_fig)
 
 
 
@@ -418,10 +418,10 @@ for i in range(len(global_variable_df)):
         plot.save_interactive_fig(fig1b_i,folder_fig, 'Graph_qc_Rf_u_Su_Dr')
 
         #Plot other CPT locations to side by side graphs of qc, Rf, u, Su, Dr and compare
-        if len(SCPT_Location)>1:
-            fig_1b.add_CPT_to_plot(df, plot_list_1b, color_list_1a_other, name_list_1b, xy_label_list_1b, xy_limit_list_1b,
-                                       multiplier_list_1b, list_of_other_CPT)
-            fig_1b.savefig(folder_fig, 'Graph_qc_Rf_u_Su_Dr_compared', fext=ext_fig)
+        # if len(SCPT_Location)>1:
+        #     fig_1b.add_CPT_to_plot(df, plot_list_1b, color_list_1a_other, name_list_1b, xy_label_list_1b, xy_limit_list_1b,
+        #                                multiplier_list_1b, list_of_other_CPT)
+        #     fig_1b.savefig(folder_fig, 'Graph_qc_Rf_u_Su_Dr_compared', fext=ext_fig)
 
 
         # save the figure in GCG's template
@@ -452,10 +452,10 @@ for i in range(len(global_variable_df)):
 
         #Plot other CPT locations to side by side graphs of qc, Rf, u, and compare
         #AMB - I think it is best to create a new different figure for that.
-        if len(SCPT_Location)>1:
-            color_list1c_other = [[['#641E16', '#C0392B', '#F1948A'] ,['#4472C4','#66FFFF'], ['#4472C4','#66FFFF']],[['#A8423F', '#00B050', '#1F497D'],['#70AD47','#CCFFCC'],['#70AD47','#CCFFCC']],[['#641E16', '#C0392B', '#F1948A'] ,['#4472C4','#66FFFF']]]
-            fig1c.add_CPT_to_plot(df, plot_list1c, color_list1c_other, name_list1c, xy_label_list1c, xy_limit_list1c, multiplier_list1c, list_of_other_CPT)
-            fig1c.savefig(folder_fig, 'Graph_qc_sigy_OCR_compared', fext=ext_fig)
+        # if len(SCPT_Location)>1:
+        #     color_list1c_other = [[['#641E16', '#C0392B', '#F1948A'] ,['#4472C4','#66FFFF'], ['#4472C4','#66FFFF']],[['#A8423F', '#00B050', '#1F497D'],['#70AD47','#CCFFCC'],['#70AD47','#CCFFCC']],[['#641E16', '#C0392B', '#F1948A'] ,['#4472C4','#66FFFF']]]
+        #     fig1c.add_CPT_to_plot(df, plot_list1c, color_list1c_other, name_list1c, xy_label_list1c, xy_limit_list1c, multiplier_list1c, list_of_other_CPT)
+        #     fig1c.savefig(folder_fig, 'Graph_qc_sigy_OCR_compared', fext=ext_fig)
 
 
 
