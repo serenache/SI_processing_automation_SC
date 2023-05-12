@@ -32,7 +32,7 @@ def check_path_exists(path):
 
 ###-----main function to return the dataframe dictionary as excel for checking purposes-----  ###
 def pd_to_excel(df, output_folder_path):
-    excel_path = os.path.join(output_folder_path, SCPT_Location[0]+"_CPT_processed_data-v2.xlsx")
+    excel_path = os.path.join(output_folder_path, SCPT_Location[0]+"_CPT_processed_data.xlsx")
     df.to_excel(excel_path)
     return
 
@@ -391,6 +391,7 @@ for i in range(len(global_variable_df)):
             fig_1a.savefig(folder_fig, 'Graph_qc_Rf_u_Su_phi_compared', fext=ext_fig)
 
 
+
         # Plot side by side graphs of qc, Rf, u, Su, Dr
         plot_list_1b = [['SCPT_RES', 'qt_uncorr', 'qt_corr'], ['Rf'], ['SCPT_PWP2', 'u2_corr', 'u0'], ['Su_UB', 'Su_LB'],
                         ['Dr_Baldi', 'Dr_Jam_sat']]
@@ -445,6 +446,7 @@ for i in range(len(global_variable_df)):
         fig1c_i = plot.side_by_side_interactive_plot(df, plot_list1c, plot_color_dict, name_list1c,
                                                     xy_label_list1c, xy_limit_list1c, multiplier_list1c,
                                                     SOIL_UNIT_TABLE, stratigraphy_color_dict)
+
         #SC: seems to have issues with the interactive plot for this figure. Comment it out firt. To be investigated later
         # plot.save_interactive_fig(fig1c_i,folder_fig,'Graph_qc_sigy_OCR')
 
@@ -474,6 +476,7 @@ for i in range(len(global_variable_df)):
         fig2=CPT_figure('A4-Portrait', 'single_plot', plot_list2)
         fig2.single_plot(df_main, plot_list2, color_list2, name_list2, xy_label_list2, xy_limit_list2, multiplier_list2)
         fig2.savefig(folder_fig, 'Graph_qc', fext=ext_fig)
+
         #amb - Try interactive plotting with bokeh
         fig2_i = plot.single_interactive_plot(df, plot_list2, plot_color_dict, name_list2,
                                               xy_label_list2, xy_limit_list2, multiplier_list2,
@@ -536,11 +539,11 @@ for i in range(len(global_variable_df)):
                                                            SOIL_UNIT_TABLE,
                                                            stratigraphy_color_dict, Dr_limits)
         fig3.savefig(folder_fig, 'stratigraphy_with_Graph_Dr', fext=ext_fig)
-        #amb - Interactive plotting with bokeh
-        # fig3 = plot.side_by_side_interactive_plot(df, plot_list3, plot_color_dict, name_list3,
-        #                                              xy_label_list3, xy_limit_list3, multiplier_list3,
-        #                                              SOIL_UNIT_TABLE, stratigraphy_color_dict)
-        # plot.save_interactive_fig(fig3,folder_fig, 'stratigraphy_with_Graph_Dr')
+        # Try interactive plotting with bokeh
+        fig3_i = plot.single_interactive_plot(df, plot_list3, plot_color_dict, name_list3,
+                                              xy_label_list3, xy_limit_list3, multiplier_list3,
+                                              SOIL_UNIT_TABLE, stratigraphy_color_dict)
+        plot.save_interactive_fig(fig3_i, folder_fig, 'Graph_Dr')
 
         # Plot of phi with Stratigraphy
         plot_list4 = ['peak_phi_UB', 'peak_phi_LB']
@@ -557,6 +560,11 @@ for i in range(len(global_variable_df)):
                                            xy_label_list4, xy_limit_list4,multiplier_list4,
                                            SOIL_UNIT_TABLE, stratigraphy_color_dict)
         fig4.savefig(folder_fig, 'stratigraphy_with_Graph_phi', fext=ext_fig)
+        # Try interactive plotting with bokeh
+        fig4_i = plot.single_interactive_plot(df, plot_list4, plot_color_dict, name_list4,
+                                              xy_label_list4, xy_limit_list4, multiplier_list4,
+                                              SOIL_UNIT_TABLE, stratigraphy_color_dict)
+        plot.save_interactive_fig(fig4_i, folder_fig, 'Graph_phi')
 
         # Plots of G0 with Stratigraphy
         plot_list5 = ['G0_A', 'G0_B', 'G0_C', 'G0_D', 'G0_E', 'G0_RS', 'G0_ICP']
@@ -582,6 +590,8 @@ for i in range(len(global_variable_df)):
                                                   stratigraphy_color_dict)
         fig5.savefig(folder_fig, 'stratigraphy_with_Graph_G0', fext=ext_fig)
 
+
+
         # Plot of Su with Stratigraphy
         plot_list6 = ['Su_UB', 'Su_LB']
         color_list6 = ['#1F497D', '#4BACC6']
@@ -599,22 +609,41 @@ for i in range(len(global_variable_df)):
                                                   stratigraphy_color_dict)
         fig6.savefig(folder_fig, 'stratigraphy_with_Graph_Su', fext=ext_fig)
 
+        # Try interactive plotting with bokeh
+        fig6_i = plot.single_interactive_plot(df, plot_list6, plot_color_dict, name_list6,
+                                              xy_label_list6, xy_limit_list6, multiplier_list6,
+                                              SOIL_UNIT_TABLE, stratigraphy_color_dict)
+        plot.save_interactive_fig(fig6_i, folder_fig, 'Graph_Su')
+
         # Plot of IC values
         plot_list7 = ['Ic']
         color_list7 = ['#0070C0']
-        name_list7 = [SCPT_Location]
+        name_list7 = plot.get_label_list(plot_list7, plot_label_dict, 0)
         # xy_label_list7 = [['Ic values'], ['Depth below mudline (m)']]
         xy_label_list = [['ic'], ['depth']]
         xy_label_list7 = plot.get_label_list(xy_label_list, axis_label_dict, 0)
         xy_limit_list7 = [[0, 4], [None, 0]]
         multiplier_list7 = [1, 1]
-        fig7 = CPT_figure('A4-Portrait', 'single_plot_with_stratigraphy', plot_list7)
-        fig7.single_plot_with_stratigraphy(df_main, plot_list7, color_list7, name_list7, xy_label_list7,
+        fig7 = CPT_figure('A4-Portrait', 'single_plot', plot_list7)
+        fig7.single_plot(df_main, plot_list7, color_list7, name_list7, xy_label_list7,
+                                                 xy_limit_list7,
+                                                 multiplier_list7)
+        fig7.savefig(folder_fig, 'Graph_Ic', fext=ext_fig)
+
+        fig7_strat = CPT_figure('A4-Portrait', 'single_plot_with_stratigraphy', plot_list7)
+        fig7_strat.single_plot_with_stratigraphy(df_main, plot_list7, color_list7, name_list7, xy_label_list7,
                                                            xy_limit_list7,
                                                            multiplier_list7,
                                                            SOIL_UNIT_TABLE,
                                                            stratigraphy_color_dict, Ic_limits)
-        fig7.savefig(folder_fig, 'stratigraphy_with_Graph_Ic', fext=ext_fig)
+        fig7_strat.savefig(folder_fig, 'Graph_Ic', fext=ext_fig)
+
+        # Try interactive plotting with bokeh
+        fig7_strat_i = plot.single_interactive_plot(df, plot_list7, plot_color_dict, name_list7,
+                                              xy_label_list7, xy_limit_list7, multiplier_list7,
+                                              SOIL_UNIT_TABLE, stratigraphy_color_dict)
+        plot.save_interactive_fig(fig7_strat_i, folder_fig, 'stratigraphy_with_Graph_Ic')
+
 
     # ###-----Create a class instance for each CPT location-----  ###
     # Location_ID_column = SCPG[['Location_ID']].replace("", float("NaN")).drop_duplicates().dropna()
