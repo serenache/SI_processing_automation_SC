@@ -642,7 +642,7 @@ for i in range(len(global_variable_df)):
         fig7_strat_i = plot.single_interactive_plot(df, plot_list7, plot_color_dict, name_list7,
                                               xy_label_list7, xy_limit_list7, multiplier_list7,
                                               SOIL_UNIT_TABLE, stratigraphy_color_dict)
-        plot.save_interactive_fig(fig7_strat_i, folder_fig, 'stratigraphy_with_Graph_Ic')
+        plot.save_interactive_fig(fig7_strat_i, folder_fig, 'Graph_Ic')
 
 
     # ###-----Create a class instance for each CPT location-----  ###
