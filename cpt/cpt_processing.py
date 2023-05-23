@@ -658,7 +658,7 @@ def assign_soil_unit(row_SCPT_depth, row_SCPT_LocationID, SOIL_UNIT):
     for i, rows in SOIL_UNIT.iterrows():
         row_soil = rows.to_frame().transpose()
         if row_soil['CPT_name'].values[0] == row_SCPT_LocationID:
-            if row_soil.DEPTH_TOP.values < row_SCPT_depth < row_soil.DEPTH_BASE.values:
+            if row_soil.DEPTH_TOP.values <= row_SCPT_depth < row_soil.DEPTH_BASE.values:
                 geol_unit = row_soil.UNIQUE_GEOL.values[0]
                 return geol_unit
                 break
