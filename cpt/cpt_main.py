@@ -447,8 +447,7 @@ for i in range(len(global_variable_df)):
                                                     xy_label_list1c, xy_limit_list1c, multiplier_list1c,
                                                     SOIL_UNIT_TABLE, stratigraphy_color_dict)
 
-        #SC: seems to have issues with the interactive plot for this figure. Comment it out firt. To be investigated later
-        # plot.save_interactive_fig(fig1c_i,folder_fig,'Graph_qc_sigy_OCR')
+        plot.save_interactive_fig(fig1c_i,folder_fig,'Graph_qc_sigy_OCR')
 
         #Plot other CPT locations to side by side graphs of qc, Rf, u, and compare
         #AMB - I think it is best to create a new different figure for that.

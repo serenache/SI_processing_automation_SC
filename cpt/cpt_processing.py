@@ -92,8 +92,11 @@ def calc_eff_sig_y_LB(qt_corr, sig_v0, m=0.72):
     """
     # if SOIL_CLASS == 'SAND':
     #     m=0.72
-
-    eff_sig_y_LB = 0.33 * ((qt_corr * 1000 - sig_v0) ** m) * (pa / 100) ** (1 - m)
+    # Cannot have a negative number raised to a fractional power hence need the IF case.
+    if (qt_corr * 1000 - sig_v0)>0:
+        eff_sig_y_LB = 0.33 * ((qt_corr * 1000 - sig_v0) ** m) * (pa / 100) ** (1 - m)
+    else:
+        eff_sig_y_LB =np.NaN
 
     return eff_sig_y_LB
 
@@ -258,7 +261,11 @@ def calc_G0_Baldi(SOIL_CLASS, qc, UNIT_WEIGHT, eff_sig_v0):
     :return: G0 in MPa
     """
     if SOIL_CLASS == 'SAND'or SOIL_CLASS == 'SILT':
-        G0 = (UNIT_WEIGHT / 9.81) * (277 * (qc ** 0.13) * (eff_sig_v0 / 1000) ** 0.27) ** 2 / 1000
+        # Cannot have a negative number raised to a fractional power hence need the IF case.
+        if qc>0:
+            G0 = (UNIT_WEIGHT / 9.81) * (277 * (qc ** 0.13) * (eff_sig_v0 / 1000) ** 0.27) ** 2 / 1000
+        else:
+            G0=np.NaN
     else:
         G0 = np.NaN
     return G0
