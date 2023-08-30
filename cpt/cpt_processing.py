@@ -92,8 +92,11 @@ def calc_eff_sig_y_LB(qt_corr, sig_v0, m=0.72):
     """
     # if SOIL_CLASS == 'SAND':
     #     m=0.72
-
-    eff_sig_y_LB = 0.33 * ((qt_corr * 1000 - sig_v0) ** m) * (pa / 100) ** (1 - m)
+    # Cannot have a negative number raised to a fractional power hence need the IF case.
+    if (qt_corr * 1000 - sig_v0)>0:
+        eff_sig_y_LB = 0.33 * ((qt_corr * 1000 - sig_v0) ** m) * (pa / 100) ** (1 - m)
+    else:
+        eff_sig_y_LB =np.NaN
 
     return eff_sig_y_LB
 
@@ -258,7 +261,11 @@ def calc_G0_Baldi(SOIL_CLASS, qc, UNIT_WEIGHT, eff_sig_v0):
     :return: G0 in MPa
     """
     if SOIL_CLASS == 'SAND'or SOIL_CLASS == 'SILT':
-        G0 = (UNIT_WEIGHT / 9.81) * (277 * (qc ** 0.13) * (eff_sig_v0 / 1000) ** 0.27) ** 2 / 1000
+        # Cannot have a negative number raised to a fractional power hence need the IF case.
+        if qc>0:
+            G0 = (UNIT_WEIGHT / 9.81) * (277 * (qc ** 0.13) * (eff_sig_v0 / 1000) ** 0.27) ** 2 / 1000
+        else:
+            G0=np.NaN
     else:
         G0 = np.NaN
     return G0
@@ -278,7 +285,7 @@ def calc_Dr_Baldi(SOIL_CLASS, qc, eff_p):
         try:
             Dr = np.minimum(1 / 2.61 * (np.log((qc * 1000) / (181 * (eff_p) ** 0.55))) * 100, 100)
         except ZeroDivisionError:
-            print('The qc and eff_p that give error = ',qc,eff_p)
+            print('The qc and eff_p that give zero division error = ',qc,eff_p)
             Dr = np.NaN
     else:
         Dr = np.NaN
@@ -296,7 +303,11 @@ def calc_Dr_Jam_dry(SOIL_CLASS, qc, eff_p):
     :return: Dr in %
     """
     if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT':
-        Dr = np.minimum(1 / 2.96 * (np.log((qc * 1000 / 98.1) / (24.94 * (eff_p / 98.1) ** 0.46))) * 100, 100)
+        try:
+            Dr = np.minimum(1 / 2.96 * (np.log((qc * 1000 / 98.1) / (24.94 * (eff_p / 98.1) ** 0.46))) * 100, 100)
+        except ZeroDivisionError:
+            print('The qc and eff_p that give zero division error = ',qc,eff_p)
+            Dr = np.NaN
     else:
         Dr = np.NaN
     return Dr
@@ -316,7 +327,11 @@ def calc_Dr_Jam_sat(SOIL_CLASS, check_value, qc, eff_sig_v0, Dr_dry):
     :return:Dr in %
     """
     if SOIL_CLASS == 'SAND' or SOIL_CLASS == 'SILT' and check_value > 2.24:
-        Dr = np.minimum((1 + (-1.87 + 2.32 * np.log(qc * 1000 / (eff_sig_v0 * pa) ** 0.5)) / 100) * Dr_dry, 100)
+        try:
+            Dr = np.minimum((1 + (-1.87 + 2.32 * np.log(qc * 1000 / (eff_sig_v0 * pa) ** 0.5)) / 100) * Dr_dry, 100)
+        except ZeroDivisionError:
+            print('The qc and eff_sig_v0 that give zero division error = ',qc,eff_sig_v0)
+            Dr = np.NaN
     else:
         Dr = np.NaN
     return Dr
@@ -658,7 +673,7 @@ def assign_soil_unit(row_SCPT_depth, row_SCPT_LocationID, SOIL_UNIT):
     for i, rows in SOIL_UNIT.iterrows():
         row_soil = rows.to_frame().transpose()
         if row_soil['CPT_name'].values[0] == row_SCPT_LocationID:
-            if row_soil.DEPTH_TOP.values < row_SCPT_depth < row_soil.DEPTH_BASE.values:
+            if row_soil.DEPTH_TOP.values <= row_SCPT_depth < row_soil.DEPTH_BASE.values:
                 geol_unit = row_soil.UNIQUE_GEOL.values[0]
                 return geol_unit
                 break
